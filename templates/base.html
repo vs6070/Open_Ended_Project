@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}UPES LMS{% endblock %} | Learn Anything</title>
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151f32',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="flex flex-col min-h-screen text-slate-50 antialiased selection:bg-sky-500 selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="glass sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="{{ url_for('home') }}" class="flex items-center gap-2 group">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-graduation-cap text-white"></i>
+                        </div>
+                        <span class="font-bold text-xl tracking-tight text-gradient">UPES LMS</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-6">
+                        <a href="{{ url_for('home') }}" class="hover:text-sky-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                        
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.role == 'student' %}
+                                <a href="{{ url_for('student.courses') }}" class="hover:text-sky-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Courses</a>
+                                <a href="{{ url_for('student.dashboard') }}" class="hover:text-sky-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
+                            {% elif current_user.role == 'instructor' %}
+                                <a href="{{ url_for('instructor.dashboard') }}" class="hover:text-sky-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Instructor Dashboard</a>
+                            {% elif current_user.role == 'admin' %}
+                                <a href="{{ url_for('admin.dashboard') }}" class="hover:text-sky-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin Dashboard</a>
+                            {% endif %}
+                            
+                            <div class="relative group ml-4">
+                                <button class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-full text-sm font-medium transition-colors border border-slate-700">
+                                    <i class="fa-solid fa-user-circle text-sky-400"></i>
+                                    {{ current_user.name.split(' ')[0] }}
+                                </button>
+                                <!-- Dropdown -->
+                                <div class="absolute right-0 mt-2 w-48 rounded-xl shadow-xl py-1 bg-slate-800 border border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+                                    <div class="px-4 py-2 border-b border-slate-700">
+                                        <p class="text-sm text-slate-300">Signed in as</p>
+                                        <p class="text-sm font-bold text-white truncate">{{ current_user.email }}</p>
+                                    </div>
+                                    <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-400 hover:bg-slate-700 transition-colors">
+                                        <i class="fa-solid fa-sign-out-alt mr-2"></i>Sign out
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="hover:text-sky-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Log In</a>
+                            <a href="{{ url_for('auth.register') }}" class="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white px-5 py-2 rounded-full text-sm font-medium shadow-lg hover:shadow-sky-500/25 transition-all transform hover:-translate-y-0.5">Sign Up Free</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-sky-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden bg-slate-850 border-b border-slate-700" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="{{ url_for('home') }}" class="hover:bg-slate-800 block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'student' %}
+                        <a href="{{ url_for('student.courses') }}" class="hover:bg-slate-800 block px-3 py-2 rounded-md text-base font-medium">Courses</a>
+                        <a href="{{ url_for('student.dashboard') }}" class="hover:bg-slate-800 block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}" class="text-red-400 hover:bg-slate-800 block px-3 py-2 rounded-md text-base font-medium">Sign out</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="hover:bg-slate-800 block px-3 py-2 rounded-md text-base font-medium">Log In</a>
+                    <a href="{{ url_for('auth.register') }}" class="text-sky-400 hover:bg-slate-800 block px-3 py-2 rounded-md text-base font-medium">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="fixed top-20 right-4 z-50 flex flex-col gap-2 max-w-sm w-full">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set bg_color = 'bg-sky-500/10 border-sky-500 text-sky-400' if category == 'success' or category == 'info' else 'bg-red-500/10 border-red-500 text-red-400' %}
+                    {% set icon = 'fa-check-circle' if category == 'success' or category == 'info' else 'fa-exclamation-circle' %}
+                    <div class="flash-message glass flex items-start gap-3 p-4 rounded-xl border-l-4 {{ bg_color }} shadow-lg animate-fade-in-up">
+                        <i class="fa-solid {{ icon }} mt-0.5"></i>
+                        <p class="text-sm font-medium">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center">
+                    <i class="fa-solid fa-graduation-cap text-white text-sm"></i>
+                </div>
+                <span class="font-bold text-lg text-slate-300">UPES LMS</span>
+            </div>
+            <p class="text-slate-500 text-sm">© {{ current_year|default('2026') }} UPES LMS. Built with <i class="fa-solid fa-heart text-sky-500 mx-1"></i> by AI.</p>
+            <div class="flex gap-4">
+                <a href="#" class="text-slate-500 hover:text-sky-400 transition-colors"><i class="fa-brands fa-github text-xl"></i></a>
+                <a href="#" class="text-slate-500 hover:text-sky-400 transition-colors"><i class="fa-brands fa-twitter text-xl"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

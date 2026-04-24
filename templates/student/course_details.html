@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in-up">
+    <!-- Breadcrumbs -->
+    <nav class="flex text-sm text-slate-400 mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{{ url_for('student.dashboard') }}" class="hover:text-white transition-colors">Dashboard</a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <i class="fa-solid fa-chevron-right text-xs mx-2"></i>
+                    <a href="{{ url_for('student.courses') }}" class="hover:text-white transition-colors">Courses</a>
+                </div>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-chevron-right text-xs mx-2"></i>
+                    <span class="text-white font-medium truncate max-w-[200px]">{{ course.title }}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content (Video Player & Info) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Video Player Placeholder -->
+            <div class="glass-card rounded-2xl overflow-hidden aspect-video relative flex flex-col items-center justify-center bg-slate-900 border border-slate-700 shadow-2xl" id="video-container">
+                {% if lessons %}
+                    <!-- In a real app, this would be an iframe or video tag taking the src from the selected lesson -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10" id="video-overlay">
+                        <div class="w-16 h-16 rounded-full bg-sky-500/80 flex items-center justify-center cursor-pointer hover:bg-sky-400 transition-colors hover:scale-110 shadow-lg shadow-sky-500/50 mb-4" onclick="playLesson()">
+                            <i class="fa-solid fa-play text-white text-xl ml-1"></i>
+                        </div>
+                        <p class="text-white font-medium" id="current-lesson-title">Select a lesson to start</p>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1616469829581-73993eb86b02?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Video Placeholder" class="w-full h-full object-cover opacity-30">
+                {% else %}
+                    <div class="text-center p-6">
+                        <i class="fa-solid fa-video-slash text-4xl text-slate-600 mb-4"></i>
+                        <p class="text-slate-400">No lessons available for this course yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Course Info -->
+            <div class="glass-card p-6 md:p-8 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">{{ course.title }}</h1>
+                    <span class="bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full text-xs font-medium border border-indigo-500/30 whitespace-nowrap"><i class="fa-solid fa-user-tie mr-1"></i> {{ course.instructor.name }}</span>
+                </div>
+                
+                <h3 class="text-lg font-bold text-white mb-2 mt-6">About this course</h3>
+                <div class="prose prose-invert prose-slate max-w-none text-slate-300 text-sm leading-relaxed">
+                    {{ course.description }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar (Lesson List) -->
+        <div class="lg:col-span-1">
+            <div class="glass-card rounded-2xl overflow-hidden sticky top-24">
+                <div class="p-6 border-b border-slate-700/50 bg-slate-800/30">
+                    <h2 class="text-xl font-bold text-white">Course Content</h2>
+                    <p class="text-sm text-slate-400 mt-1">{{ lessons|length }} lessons</p>
+                </div>
+                
+                <div class="max-h-[600px] overflow-y-auto">
+                    {% if lessons %}
+                        <ul class="divide-y divide-slate-700/50">
+                            {% for lesson in lessons %}
+                                <li>
+                                    <button class="w-full text-left p-4 hover:bg-slate-700/50 transition-colors flex items-start gap-3 group focus:outline-none focus:bg-slate-700/80" onclick="selectLesson('{{ lesson.title }}', '{{ lesson.video_url }}')">
+                                        <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-colors border border-slate-700">
+                                            <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-slate-200 group-hover:text-white transition-colors">{{ lesson.order_num + 1 }}. {{ lesson.title }}</p>
+                                            <p class="text-xs text-slate-500 mt-1 flex items-center"><i class="fa-brands fa-youtube mr-1"></i> Video</p>
+                                        </div>
+                                    </button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="p-8 text-center text-slate-400 text-sm">
+                            Lessons will appear here once added by the instructor.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectLesson(title, url) {
+        document.getElementById('current-lesson-title').innerText = title;
+        // In a real app, you'd update the video src here.
+        // For this demo, we'll just show the title.
+    }
+    
+    function playLesson() {
+        alert("In a full implementation, this would load the video URL into an iframe/player.");
+    }
+</script>
+{% endblock %}
